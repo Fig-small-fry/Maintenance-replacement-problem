@@ -24,14 +24,14 @@ phi1 = lambda x, k: np.exp(-x)
 phi2 = lambda x, k: x**2
 
 X = np.array([1, 2, 3, 4, 5])
-K = len(X)-1
+K = len(X)
 T = 10
 
 u_star = optimal_replacement_policy(X, K, T, phi1,phi2)
 print("Optimal replacement policy:", u_star)
 
 X = np.array([0.5, 1.5, 2.5, 3.5, 4.5])
-K = len(X)-1
+K = len(X)
 T = 2.0
 
 u_star = optimal_replacement_policy(X, K, T, phi1,phi2)
