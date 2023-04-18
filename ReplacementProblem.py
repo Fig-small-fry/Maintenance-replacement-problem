@@ -1,39 +1,56 @@
 #!/usr/bin/env python3  
-import numpy as np
+import math
+# Define the cost functions phi1 and phi2, as well as the value function c
+def phi1(x, k):
+    # Compute the cost of replacing a machine of age x at time k
+    return math.exp(-x) - T * math.sqrt(k)
 
-def optimal_replacement_policy(X, K, T, phi1, phi2):
-    # Initialize the value function to zero
-    V = np.zeros(K+1)
+def phi2(x, k):
+    # Compute the cost of operating a machine of age x at time k
+    return x**2
 
-    # Loop backwards in time from K-1 to 0
-    for k in range(K-1, -1, -1):
-        # Compute the value function for all possible actions
-        action_values = [(1-u)*phi2(X[k],k) + u*(np.exp(-X[k])-T*np.sqrt(k)) + V[k+1] for u in [0, 1]]
+def c(x, k):
+    # Compute the value of a machine of age x at time k
+    return math.exp(-x)
 
-        # Choose the optimal action (0 = keep, 1 = replace)
-        u_star = np.argmin(action_values)
-
-        # Update the value function and optimal policy
-        V[k] = action_values[u_star]
-        u_k = u_star
-
-    return u_k
-
-# Example usage:
-phi1 = lambda x, k: np.exp(-x)
-phi2 = lambda x, k: x**2
-
-X = np.array([1, 2, 3, 4, 5])
-K = len(X)
+# Define the time horizon K and the maximum machine age X
+K = 5
+X = 4   
 T = 10
 
-u_star = optimal_replacement_policy(X, K, T, phi1,phi2)
-print("Optimal replacement policy:", u_star)
+# Initialize the value function array and the optimal policy array
+V = [[0 for x in range(X+1)] for k in range(K+1)]
+optimal_policy = [0 for k in range(K)]
 
-X = np.array([0.5, 1.5, 2.5, 3.5, 4.5])
-K = len(X)
-T = 2.0
+x = 1
+k = 0
 
-u_star = optimal_replacement_policy(X, K, T, phi1,phi2)
-print("Optimal replacement policy:", u_star)
+while x <= X and k < K:
+    # Compute the expected cost of keeping the machine
+    keep_cost = phi2(x, k) + V[k+1][x]
+    print("keep cost:",keep_cost)
+
+    # Compute the expected cost of replacing the machine
+    replace_cost = phi1(x, k) + c(0, k) + V[0][0]
+    print("replace cost:",replace_cost)
+
+    # Check if the machine age is equal to the maximum age and the current time period is less than or equal to K
+    if x == X :
+        V[k][x] = replace_cost
+        optimal_policy[k] = 1
+        x=1
+        k+=1
+    else:
+        # Choose the action with the lowest expected cost
+        if replace_cost < keep_cost:
+            V[k][x] = replace_cost
+            optimal_policy[k] = 0
+        else:
+            V[k][x] = keep_cost
+            optimal_policy[k] = 1
+        x += 1
+        k +=1
+
+
+print(optimal_policy)
 
